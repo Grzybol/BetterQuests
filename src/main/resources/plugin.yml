@@ -1,0 +1,21 @@
+name: BetterQuests
+version: ${project.version}
+main: org.betterbox.betterQuests.BetterQuests
+api-version: '1.18'
+load: STARTUP
+authors: [ Grzybol ]
+commands:
+  bq:
+    description: Base command for BetterQuests
+    usage: /<command>
+    permission: betterquests.command
+permissions:
+  betterquests.command:
+    description: "Allows use of all BetterQuests commands"
+    default: op
+  betterquests.reload:
+    description: "Allows reloading of the BetterQuests configurations"
+    default: op
+  betterquests.npcspawn:
+    description: "Allows spawning of the BetterQuests NPC"
+    default: op

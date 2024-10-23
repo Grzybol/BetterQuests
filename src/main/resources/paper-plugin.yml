@@ -1,0 +1,12 @@
+name: BetterQuests
+version: ${project.version}
+main: org.betterbox.betterQuests.BetterQuests
+api-version: '1.18'
+load: STARTUP
+authors: [ Grzybol ]
+commands:
+  bq npcspawn:
+    description: Spawns an NPC at player's location
+    usage: /bq npcspawn
+    aliases:
+      - betterquests npcspawn
