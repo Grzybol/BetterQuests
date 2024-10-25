@@ -35,15 +35,15 @@ public class CommandManager implements CommandExecutor {
         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "CommandManager.onCommand called, sender: " + sender + ", args: " + String.join(", ", args));
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("betterquests.reload")) {
-                sender.sendMessage(ChatColor.DARK_RED + " You don't have permission to do that!");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
             }
             configManager.ReloadConfig();
-            sender.sendMessage(ChatColor.AQUA + " Configuration reloaded!");
+            sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + " Configuration reloaded!");
             return true;
         }else if (args.length == 1 && args[0].equalsIgnoreCase("help")){
             if (!sender.hasPermission("betterquests.help")) {
-                sender.sendMessage(ChatColor.DARK_RED + " You don't have permission to do that!");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
             }
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+" /bq npcspawn <name>");
@@ -56,7 +56,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             if (!sender.hasPermission("betterquests.npcspawn")) {
-                sender.sendMessage(ChatColor.DARK_RED + " You don't have permission to do that!");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
             }
             Player player = (Player) sender;
@@ -81,11 +81,11 @@ public class CommandManager implements CommandExecutor {
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.DARK_RED + "This command can only be used by players.");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + "This command can only be used by players.");
                 return true;
             }
             if (!sender.hasPermission("betterquests.npcdelete")) {
-                sender.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + "You don't have permission to do that!");
                 return true;
             }
 
@@ -99,7 +99,7 @@ public class CommandManager implements CommandExecutor {
                     if (villager.getCustomName() != null && villager.getCustomName().equalsIgnoreCase(villagerName)) {
                         villager.remove();
                         found = true;
-                        sender.sendMessage(ChatColor.GREEN + "Villager '" + villagerName + "' has been deleted.");
+                        sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + "Villager '" + villagerName + "' has been deleted.");
                         break; // Usuwa pierwszy znaleziony wieśniak o podanej nazwie
                     }
                 }
@@ -111,17 +111,17 @@ public class CommandManager implements CommandExecutor {
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("saveitem")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.DARK_RED + "This command can only be used by players.");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + "This command can only be used by players.");
                 return true;
             }
             if (!sender.hasPermission("betterquests.saveitem")) {
-                sender.sendMessage(ChatColor.DARK_RED + " You don't have permission to do that!");
+                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
             }
             Player player = (Player) sender;
             ItemStack itemStack = player.getInventory().getItemInMainHand();
             fileManager.saveItemStackToFile(args[1],itemStack);
-            sender.sendMessage(ChatColor.GREEN + " Itemstack saved to file");
+            sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + " Itemstack saved to file");
             return true;
         }
         return false;

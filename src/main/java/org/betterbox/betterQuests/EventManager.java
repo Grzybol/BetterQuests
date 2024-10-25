@@ -1,6 +1,7 @@
 package org.betterbox.betterQuests;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -102,7 +103,13 @@ public class EventManager implements Listener {
         Duration fadeOut = Duration.ofMillis(300); // czas znikania
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Component TitleComponent;
+        ItemStack item = betterQuests.rewardItem;
         String name =  betterQuests.rewardItem.getType().name().replace("_", " ").toLowerCase();
+        if(item.hasItemMeta() && item.getItemMeta().displayName() != null){
+            // Używanie PlainTextComponentSerializer do konwersji Component na String
+            name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName())+" x"+item.getAmount();
+        }
+
         TitleComponent = Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + "Reward: "+name);
         Component SubtitleComponent = Component.text(ChatColor.GOLD +"Removed: "+configManager.getActiveRequiredItemStacksString());
         // Notify the killer
