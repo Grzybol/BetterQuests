@@ -81,8 +81,8 @@ public class EventManager implements Listener {
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Component TitleComponent;
         String name =  betterQuests.rewardItem.getType().name().replace("_", " ").toLowerCase();
-        TitleComponent = Component.text(ChatColor.GOLD + "" + ChatColor.BOLD + "Reward: "+name);
-        Component SubtitleComponent = Component.text(ChatColor.DARK_RED +"Removed: "+configManager.getActiveRequiredItemStacksString());
+        TitleComponent = Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + "Reward: "+name);
+        Component SubtitleComponent = Component.text(ChatColor.GOLD +"Removed: "+configManager.getActiveRequiredItemStacksString());
         // Notify the killer
         Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
         player.showTitle(killerTitle);

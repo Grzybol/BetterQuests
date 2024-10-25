@@ -57,7 +57,9 @@ public class CommandManager implements CommandExecutor {
             Player player = (Player) sender;
             Location loc = player.getLocation();
             Villager villager = (Villager) player.getWorld().spawnEntity(loc, EntityType.VILLAGER);
-            villager.setCustomName(args[1]);
+            // Tłumaczenie kodów kolorów w nazwie
+            String coloredName = ChatColor.translateAlternateColorCodes('&', args[1]);
+            villager.setCustomName(coloredName);
             villager.setCustomNameVisible(true);
             villager.setAI(false);  // Disable AI to make the villager stay in place
             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
