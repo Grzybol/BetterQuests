@@ -76,12 +76,12 @@ public class EventManager implements Listener {
         DecimalFormat df = new DecimalFormat("#.##");
 
         Duration fadeIn = Duration.ofMillis(300);  // czas pojawiania się
-        Duration stay = Duration.ofMillis(2000);    // czas wyświetlania
+        Duration stay = Duration.ofMillis(5000);    // czas wyświetlania
         Duration fadeOut = Duration.ofMillis(300); // czas znikania
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Component TitleComponent;
         String name =  betterQuests.rewardItem.getType().name().replace("_", " ").toLowerCase();
-        TitleComponent = Component.text(ChatColor.GOLD + "" + ChatColor.BOLD + "Reward: +");
+        TitleComponent = Component.text(ChatColor.GOLD + "" + ChatColor.BOLD + "Reward: "+name);
         Component SubtitleComponent = Component.text(ChatColor.DARK_RED +"Removed: "+configManager.getActiveRequiredItemStacksString());
         // Notify the killer
         Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
