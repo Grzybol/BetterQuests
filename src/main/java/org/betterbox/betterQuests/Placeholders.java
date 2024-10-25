@@ -1,5 +1,6 @@
 package org.betterbox.betterQuests;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 
 public class Placeholders extends PlaceholderExpansion {
@@ -77,8 +78,8 @@ public class Placeholders extends PlaceholderExpansion {
             case "current_requirements":
                 return configManager.getActiveRequiredItemStacksString();
             case "reward_item":
-                if (plugin.configManager.rewardItem != null) {
-                    return plugin.configManager.rewardItem.getType().toString().replace("_", " ").toLowerCase()+" x"+plugin.configManager.rewardItem.getAmount();
+                if (plugin.rewardItem != null) {
+                    return PlainTextComponentSerializer.plainText().serialize(plugin.rewardItem.getItemMeta().displayName())+" x"+plugin.rewardItem.getAmount();
                 } else {
                     return "No reward set";
                 }
