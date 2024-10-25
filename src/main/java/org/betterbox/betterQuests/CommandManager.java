@@ -41,7 +41,11 @@ public class CommandManager implements CommandExecutor {
             configManager.ReloadConfig();
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + " Configuration reloaded!");
             return true;
-        }else if (args.length == 1 && args[0].equalsIgnoreCase("help")){
+        }else if (args.length == 1 && args[0].equalsIgnoreCase("info")){
+            sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+"Author: "+plugin.getDescription().getAuthors());
+            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "[BetterQuests]" + ChatColor.AQUA + " Version: "+plugin.getDescription().getVersion());
+        }
+        else if (args.length == 1 && args[0].equalsIgnoreCase("help")){
             if (!sender.hasPermission("betterquests.help")) {
                 sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
