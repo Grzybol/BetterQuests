@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -34,6 +35,17 @@ public class EventManager implements Listener {
         this.betterQuests = betterQuests;
         this.configManager =configManager;
     }
+    @EventHandler
+    public void onVillagerDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Villager) {
+            Villager villager = (Villager) event.getEntity();
+            PersistentDataContainer pdc = villager.getPersistentDataContainer();
+            String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
+            if (tag != null && tag.equals("betterQuestsNPC")) {
+                event.setCancelled(true);
+            }
+        }
+    }
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
@@ -45,6 +57,9 @@ public class EventManager implements Listener {
                 String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
                 pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity villager tags: "+tag);
                 if (tag != null && tag.equals("betterQuestsNPC")) {
+                    if(event.getPlayer().isSneaking() && event.getPlayer().isOp()){
+                        villager.remove();
+                    }
                     Player player = event.getPlayer();
                     if (checkAndRemoveItems(player)) {
                         showRewardItems(player);
@@ -160,4 +175,5 @@ public class EventManager implements Listener {
             }
         }
     }
+
 }

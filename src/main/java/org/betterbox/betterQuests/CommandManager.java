@@ -1,7 +1,10 @@
 package org.betterbox.betterQuests;
 
+import net.kyori.adventure.platform.facet.Facet;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,14 +66,18 @@ public class CommandManager implements CommandExecutor {
             String coloredName = ChatColor.translateAlternateColorCodes('&', args[1]);
             villager.setCustomName(coloredName);
             villager.setCustomNameVisible(true);
-            villager.setAI(false);  // Disable AI to make the villager stay in place
+            AttributeInstance attribute = villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+            if (attribute != null) {
+                attribute.setBaseValue(0);
+            }
+            villager.setAI(true);  // Disable AI to make the villager stay in place
             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
 
             // Dodanie niestandardowego tagu do PDC
             PersistentDataContainer pdc = villager.getPersistentDataContainer();
             pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterQuestsNPC");
 
-            sender.sendMessage(ChatColor.GREEN + " Villager NPC spawned!");
+            sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests] "+ChatColor.AQUA+ " Villager NPC spawned!");
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
             if (!(sender instanceof Player)) {
@@ -81,10 +88,11 @@ public class CommandManager implements CommandExecutor {
                 sender.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
                 return true;
             }
+
             Player player = (Player) sender;
             String villagerName = args[1];
             boolean found = false;
-
+            player.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests] "+ChatColor.AQUA+" Shift+Right click to delete NPC");
             for (Entity entity : player.getWorld().getEntities()) {
                 if (entity instanceof Villager) {
                     Villager villager = (Villager) entity;
