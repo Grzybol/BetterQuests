@@ -1,5 +1,7 @@
 package org.betterbox.betterQuests;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,15 +14,23 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventManager implements Listener {
     private final BetterQuests betterQuests;
     private final PluginLogger pluginLogger;
+    private final ConfigManager configManager;
 
-    public EventManager(PluginLogger pluginLogger, BetterQuests betterQuests) {
+    public EventManager(PluginLogger pluginLogger, BetterQuests betterQuests, ConfigManager configManager) {
         this.pluginLogger = pluginLogger;
         this.betterQuests = betterQuests;
+        this.configManager =configManager;
     }
 
     @EventHandler
@@ -30,9 +40,79 @@ public class EventManager implements Listener {
             // Sprawdzenie, czy Villager ma odpowiednią nazwę, np. "Quest Villager"
             if (villager.getCustomName() != null && villager.getCustomName().equals(ChatColor.GOLD + "Quest Villager")) {
                 Player player = event.getPlayer();
-                openNPCDialog(player);
+                if(checkAndRemoveItems(player)){
+                    showRewardItems(player);
+                    player.getInventory().addItem(betterQuests.rewardItem);
+                    pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity rewarding player: "+player+" with: "+ betterQuests.rewardItem);
+                }else {
+                    showRequiredItems(player);
+
+                }
+                //openNPCDialog(player);
             }
         }
+    }
+    private void showRequiredItems(Player player) {
+        pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.showRequiredItems called with parameters: "+player);
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        Duration fadeIn = Duration.ofMillis(300);  // czas pojawiania się
+        Duration stay = Duration.ofMillis(2000);    // czas wyświetlania
+        Duration fadeOut = Duration.ofMillis(300); // czas znikania
+        Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
+        Component TitleComponent;
+        TitleComponent = Component.text(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Not enough items! Required items:");
+        // Inicjalizacja StringBuilder
+
+        Component SubtitleComponent = Component.text(ChatColor.GOLD +configManager.getActiveRequiredItemStacksString());
+        // Notify the killer
+        Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
+        player.showTitle(killerTitle);
+        player.sendMessage(ChatColor.DARK_RED+ ""+ChatColor.BOLD + "Not enough items! Required items: "+configManager.getActiveRequiredItemStacksString());
+    }
+
+    private void showRewardItems(Player player) {
+        pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Event: notifyPlayersAboutPoints called with parameters: "+player);
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        Duration fadeIn = Duration.ofMillis(300);  // czas pojawiania się
+        Duration stay = Duration.ofMillis(2000);    // czas wyświetlania
+        Duration fadeOut = Duration.ofMillis(300); // czas znikania
+        Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
+        Component TitleComponent;
+        String name =  betterQuests.rewardItem.getType().name().replace("_", " ").toLowerCase();
+        TitleComponent = Component.text(ChatColor.GOLD + "" + ChatColor.BOLD + "Reward: +");
+        Component SubtitleComponent = Component.text(ChatColor.DARK_RED +"Removed: "+configManager.getActiveRequiredItemStacksString());
+        // Notify the killer
+        Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
+        player.showTitle(killerTitle);
+    }
+    public boolean checkAndRemoveItems(Player player) {
+        PlayerInventory inventory = player.getInventory();
+        Map<Material, Integer> neededItems = new HashMap<>();
+
+        // Zliczanie potrzebnych przedmiotów
+        for (ItemStack requiredItem : configManager.activeRequiredItemStacks) {
+            Material material = requiredItem.getType();
+            int amount = requiredItem.getAmount();
+            neededItems.put(material, neededItems.getOrDefault(material, 0) + amount);
+        }
+
+        // Sprawdzanie, czy gracz ma wszystkie potrzebne przedmioty w odpowiedniej ilości
+        for (Map.Entry<Material, Integer> entry : neededItems.entrySet()) {
+            if (inventory.contains(entry.getKey(), entry.getValue())) {
+                continue;
+            } else {
+                return false; // Gracz nie ma wystarczającej ilości któregoś z przedmiotów
+            }
+        }
+
+        // Usuwanie przedmiotów, jeśli gracz ma wszystkie potrzebne
+        for (Map.Entry<Material, Integer> entry : neededItems.entrySet()) {
+            inventory.removeItem(new ItemStack(entry.getKey(), entry.getValue()));
+        }
+
+        return true;
     }
 
     private void openNPCDialog(Player player) {
@@ -40,7 +120,7 @@ public class EventManager implements Listener {
 
         ItemStack accept = new ItemStack(Material.GREEN_WOOL, 1);
         ItemMeta acceptMeta = accept.getItemMeta();
-        acceptMeta.setDisplayName(ChatColor.GREEN + "Akceptuj");
+        acceptMeta.setDisplayName(ChatColor.GREEN + "A");
         accept.setItemMeta(acceptMeta);
 
         ItemStack decline = new ItemStack(Material.RED_WOOL, 1);

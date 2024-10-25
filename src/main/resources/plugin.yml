@@ -19,3 +19,6 @@ permissions:
   betterquests.npcspawn:
     description: "Allows spawning of the BetterQuests NPC"
     default: op
+    betterquests.saveitem:
+      description: "Allows saving items"
+      default: op

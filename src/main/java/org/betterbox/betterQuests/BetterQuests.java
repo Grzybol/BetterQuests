@@ -1,6 +1,7 @@
 package org.betterbox.betterQuests;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -14,6 +15,8 @@ public final class BetterQuests extends JavaPlugin {
     private PluginLogger pluginLogger;
     private String folderPath;
     YamlConfiguration generatorsConfig;
+
+    public ItemStack rewardItem;
 
     @Override
     public void onEnable() {
@@ -32,10 +35,10 @@ public final class BetterQuests extends JavaPlugin {
         Set<PluginLogger.LogLevel> defaultLogLevels = EnumSet.of(PluginLogger.LogLevel.INFO, PluginLogger.LogLevel.WARNING, PluginLogger.LogLevel.ERROR);
         pluginLogger = new PluginLogger(folderPath, defaultLogLevels,this);
         folderPath =getDataFolder().getAbsolutePath();
-        configManager = new ConfigManager(this, pluginLogger, folderPath);
+        configManager = new ConfigManager(this, pluginLogger, folderPath,this);
         fileManager = new FileManager(getDataFolder().getAbsolutePath(),this,this,pluginLogger);
         getCommand("bq").setExecutor(new CommandManager(this,this,fileManager,pluginLogger,configManager));
-        eventManager = new EventManager(pluginLogger,this);
+        eventManager = new EventManager(pluginLogger,this, configManager);
         getServer().getPluginManager().registerEvents(eventManager, this);
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Starting startGeneratorsScheduler and loadGenerators()");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Generators loaded, starting schedulers");
@@ -44,6 +47,7 @@ public final class BetterQuests extends JavaPlugin {
         logger.info("[BetterQuest] Running");
 
     }
+
 
     @Override
     public void onDisable() {
