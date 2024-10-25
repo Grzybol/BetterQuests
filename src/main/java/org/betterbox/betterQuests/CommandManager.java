@@ -10,6 +10,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CommandManager implements CommandExecutor {
@@ -63,6 +65,11 @@ public class CommandManager implements CommandExecutor {
             villager.setCustomNameVisible(true);
             villager.setAI(false);  // Disable AI to make the villager stay in place
             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
+
+            // Dodanie niestandardowego tagu do PDC
+            PersistentDataContainer pdc = villager.getPersistentDataContainer();
+            pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterQuestsNPC");
+
             sender.sendMessage(ChatColor.GREEN + " Villager NPC spawned!");
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {

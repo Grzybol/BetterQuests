@@ -1,5 +1,6 @@
 package org.betterbox.betterQuests;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,12 +18,13 @@ public final class BetterQuests extends JavaPlugin {
     YamlConfiguration generatorsConfig;
 
     public ItemStack rewardItem;
+    private NamespacedKey villagerKey;
 
     @Override
     public void onEnable() {
         //getServer().getPluginManager().registerEvents(this, this);
         java.util.logging.Logger logger = this.getLogger();
-
+        villagerKey = new NamespacedKey(this, "custom_villager");
         folderPath = getDataFolder().getAbsolutePath();
         logger.info("[BetterQuest] Initializing");
         logger.info("[BetterQuest] Author " + this.getDescription().getAuthors());
@@ -46,6 +48,9 @@ public final class BetterQuests extends JavaPlugin {
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Plugin enabled");
         logger.info("[BetterQuest] Running");
 
+    }
+    public NamespacedKey getVillagerKey() {
+        return villagerKey;
     }
 
 

@@ -16,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -38,15 +40,20 @@ public class EventManager implements Listener {
         if (event.getRightClicked() instanceof Villager) {
             Villager villager = (Villager) event.getRightClicked();
             // Sprawdzenie, czy Villager ma odpowiednią nazwę, np. "Quest Villager"
-            if (villager.getCustomName() != null && villager.getCustomName().equals(ChatColor.GOLD + "Quest Villager")) {
-                Player player = event.getPlayer();
-                if(checkAndRemoveItems(player)){
-                    showRewardItems(player);
-                    player.getInventory().addItem(betterQuests.rewardItem);
-                    pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity rewarding player: "+player+" with: "+ betterQuests.rewardItem);
-                }else {
-                    showRequiredItems(player);
+            if (villager.getCustomName() != null ) {
+                PersistentDataContainer pdc = villager.getPersistentDataContainer();
+                String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
+                pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity villager tags: "+tag);
+                if (tag != null && tag.equals("betterQuestsNPC")) {
+                    Player player = event.getPlayer();
+                    if (checkAndRemoveItems(player)) {
+                        showRewardItems(player);
+                        player.getInventory().addItem(betterQuests.rewardItem);
+                        pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity rewarding player: " + player + " with: " + betterQuests.rewardItem);
+                    } else {
+                        showRequiredItems(player);
 
+                    }
                 }
                 //openNPCDialog(player);
             }
