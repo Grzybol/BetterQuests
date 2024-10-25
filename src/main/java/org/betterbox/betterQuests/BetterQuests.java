@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class BetterQuests extends JavaPlugin {
+    public long lastReset;
     FileManager fileManager;
     ConfigManager configManager;
     EventManager eventManager;
@@ -19,6 +20,7 @@ public final class BetterQuests extends JavaPlugin {
 
     public ItemStack rewardItem;
     private NamespacedKey villagerKey;
+    private Placeholders placeholdersManager;
 
     @Override
     public void onEnable() {
@@ -46,6 +48,14 @@ public final class BetterQuests extends JavaPlugin {
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Generators loaded, starting schedulers");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Schedulers started");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Plugin enabled");
+        // Inicjalizacja Placeholders
+        placeholdersManager = new Placeholders(this,configManager);
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            boolean success = placeholdersManager.register();
+            pluginLogger.log(PluginLogger.LogLevel.DEBUG, "BetterQuests: Placeholders zostały zarejestrowane w PlaceholderAPI. success="+success);
+        } else {
+            pluginLogger.log(PluginLogger.LogLevel.WARNING, "BetterQuests: Warning: PlaceholderAPI not found, placeholders will NOT be available.");
+        }
         logger.info("[BetterQuest] Running");
 
     }

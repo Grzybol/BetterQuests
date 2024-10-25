@@ -16,6 +16,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class ConfigManager {
+    public int numberOfDifferentResources;
+    public int quantityOfResources;
+    public int refreshTimeInMinutes;
     private JavaPlugin plugin;
     private final PluginLogger pluginLogger;
     private File configFile = null;
@@ -90,9 +93,9 @@ public class ConfigManager {
         }
 
         //REQUIRED ITEMS SECTION
-        int numberOfDifferentResources = 3;
-        int quantityOfResources= 64;
-        int refreshTimeInMinutes = 30;
+        numberOfDifferentResources = 3;
+        quantityOfResources= 64;
+        refreshTimeInMinutes = 30;
         requiredItems=new ArrayList<>();
         requiredItemStacks=new ArrayList<>();
         rewardItem=null;
@@ -241,6 +244,7 @@ public class ConfigManager {
                 for (int i = 0; i < numberOfDiffMaterials; i++) {
                     activeRequiredItemStacks.add(shuffledList.get(i));
                 }
+                betterQuests.lastReset= System.currentTimeMillis();
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("BetterQuests"), 0, 20 * 60 * minutes);
     }

@@ -4,6 +4,7 @@ main: org.betterbox.betterQuests.BetterQuests
 api-version: '1.18'
 load: STARTUP
 authors: [ Grzybol ]
+depend: [PlaceholderAPI]
 commands:
   bq:
     description: Base command for BetterQuests
