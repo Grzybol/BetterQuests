@@ -3,9 +3,7 @@ package org.betterbox.betterQuests;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -66,8 +64,15 @@ public class EventManager implements Listener {
                         showRewardItems(player);
                         player.getInventory().addItem(betterQuests.rewardItem);
                         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity rewarding player: " + player + " with: " + betterQuests.rewardItem);
+                        // Odtwarzanie dźwięku akceptacji i wyświetlanie cząsteczek
+                        villager.getWorld().playSound(villager.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                        villager.getWorld().spawnParticle(Particle.HEART, villager.getLocation().add(0, 1, 0), 10);
+
                     } else {
                         showRequiredItems(player);
+                        // Odtwarzanie dźwięku odmowy i wyświetlanie cząsteczek
+                        villager.getWorld().playSound(villager.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                        villager.getWorld().spawnParticle(Particle.SMOKE_NORMAL, villager.getLocation().add(0, 1, 0), 10);
 
                     }
                 }
