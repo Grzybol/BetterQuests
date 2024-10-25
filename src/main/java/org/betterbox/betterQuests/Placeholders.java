@@ -71,7 +71,6 @@ public class Placeholders extends PlaceholderExpansion {
         double points=0;
         switch (identifier) {
             case "time_left":
-                // Obliczenie pozostałego czasu
                 long elapsedTime = System.currentTimeMillis() - plugin.lastReset;
                 long remainingTime = (configManager.refreshTimeInMinutes * 60 * 1000) - elapsedTime;
                 return formatTime(remainingTime);
@@ -79,9 +78,9 @@ public class Placeholders extends PlaceholderExpansion {
                 return configManager.getActiveRequiredItemStacksString();
             case "reward_item":
                 if (plugin.configManager.rewardItem != null) {
-                    return plugin.configManager.rewardItem.getType().toString().replace("_", " ").toLowerCase();
+                    return plugin.configManager.rewardItem.getType().toString().replace("_", " ").toLowerCase()+" x"+plugin.configManager.rewardItem.getAmount();
                 } else {
-                    return "Brak nagrody";
+                    return "No reward set";
                 }
         }
         return null; // Zwróć null, jeśli placeholder nie jest obsługiwany
