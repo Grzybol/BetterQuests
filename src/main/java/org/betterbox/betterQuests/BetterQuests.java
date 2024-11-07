@@ -1,13 +1,21 @@
 package org.betterbox.betterQuests;
 
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public final class BetterQuests extends JavaPlugin {
     public long lastReset;
@@ -56,8 +64,37 @@ public final class BetterQuests extends JavaPlugin {
         } else {
             pluginLogger.log(PluginLogger.LogLevel.WARNING, "BetterQuests: Warning: PlaceholderAPI not found, placeholders will NOT be available.");
         }
+        configureAllVillagers();
         logger.info("[BetterQuest] Running");
 
+    }
+    public void configureAllVillagers() {
+        pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Configuring all villagers");
+
+        Map<String, String> allVillagers = fileManager.loadAllVillagerInfoFromFile();
+
+        for (Map.Entry<String, String> entry : allVillagers.entrySet()) {
+            String uuid = entry.getKey();
+            Entity entity = this.getServer().getEntity(UUID.fromString(uuid));
+            if (entity != null && entity.getType() == EntityType.VILLAGER) {
+                Villager villager = (Villager) entity;
+
+                String coloredName = ChatColor.translateAlternateColorCodes('&', entry.getValue());
+                villager.setCustomName(coloredName);
+                villager.setCustomNameVisible(true);
+
+                AttributeInstance attribute = villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+                if (attribute != null) {
+                    attribute.setBaseValue(0);  // Make the villager immobile
+                }
+
+                villager.setAI(true);
+                villager.setInvulnerable(true);
+                villager.setCollidable(false);
+            } else {
+                pluginLogger.log(PluginLogger.LogLevel.ERROR, "Entity with UUID: " + uuid + " is not a Villager or doesn't exist");
+            }
+        }
     }
     public NamespacedKey getVillagerKey() {
         return villagerKey;

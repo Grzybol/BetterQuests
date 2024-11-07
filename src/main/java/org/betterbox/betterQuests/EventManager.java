@@ -4,11 +4,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -33,6 +36,22 @@ public class EventManager implements Listener {
         this.pluginLogger = pluginLogger;
         this.betterQuests = betterQuests;
         this.configManager =configManager;
+    }
+    @EventHandler
+    public void onVillagerSpawn(CreatureSpawnEvent event) {
+        if (event.getEntity() instanceof Villager) {
+            Villager villager = (Villager) event.getEntity();
+            PersistentDataContainer pdc = villager.getPersistentDataContainer();
+            if (pdc.has(betterQuests.getVillagerKey(), PersistentDataType.STRING)) {
+                AttributeInstance attribute = villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+                if (attribute != null) {
+                    attribute.setBaseValue(0);
+                }
+                villager.setAI(false);
+                villager.setInvulnerable(true);
+                villager.setCollidable(false);
+            }
+        }
     }
     @EventHandler
     public void onVillagerDamage(EntityDamageByEntityEvent event) {

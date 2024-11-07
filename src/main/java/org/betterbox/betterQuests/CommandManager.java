@@ -39,6 +39,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             configManager.ReloadConfig();
+            betterQuests.configureAllVillagers();
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + " Configuration reloaded!");
             return true;
         }else if (args.length == 1 && args[0].equalsIgnoreCase("info")){
@@ -63,9 +64,11 @@ public class CommandManager implements CommandExecutor {
                 sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
                 return true;
             }
+
             Player player = (Player) sender;
             Location loc = player.getLocation();
             Villager villager = (Villager) player.getWorld().spawnEntity(loc, EntityType.VILLAGER);
+            pluginLogger.log(PluginLogger.LogLevel.DEBUG, "CommandManager.onCommand npcspawn, player: "+player.getName()+", villager.getLocation(): "+villager.getLocation()+", loc: "+loc);
             // Tłumaczenie kodów kolorów w nazwie
             String coloredName = ChatColor.translateAlternateColorCodes('&', args[1]);
             villager.setCustomName(coloredName);
@@ -74,13 +77,15 @@ public class CommandManager implements CommandExecutor {
             if (attribute != null) {
                 attribute.setBaseValue(0);
             }
-            villager.setAI(true);  // Disable AI to make the villager stay in place
+            villager.setAI(true);
             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
+            villager.setCollidable(false);
+            //villager.
 
             // Dodanie niestandardowego tagu do PDC
             PersistentDataContainer pdc = villager.getPersistentDataContainer();
             pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterQuestsNPC");
-
+            fileManager.saveVillagerInfoToFile(villager.getUniqueId().toString(),args[1]);
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests] "+ChatColor.AQUA+ " Villager NPC spawned!");
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
