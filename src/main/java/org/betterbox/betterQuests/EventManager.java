@@ -74,6 +74,7 @@ public class EventManager implements Listener {
                 PersistentDataContainer pdc = villager.getPersistentDataContainer();
                 String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
                 pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity villager tags: "+tag);
+                betterQuests.sendLogToElasticsearch("EventManager.onPlayerInteractEntity villager tags: "+tag, "DEBUG");
                 if (tag != null && tag.equals("betterQuestsNPC")) {
                     if(event.getPlayer().isSneaking() && event.getPlayer().isOp()){
                         villager.remove();
@@ -82,6 +83,7 @@ public class EventManager implements Listener {
                     if (checkAndRemoveItems(player)) {
                         showRewardItems(player);
                         player.getInventory().addItem(betterQuests.rewardItem);
+                        betterQuests.sendLogToElasticsearch("EventManager.onPlayerInteractEntity rewarding player: " + player + " with: " + betterQuests.rewardItem, "DEBUG");
                         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity rewarding player: " + player + " with: " + betterQuests.rewardItem);
                         // Odtwarzanie dźwięku akceptacji i wyświetlanie cząsteczek
                         villager.getWorld().playSound(villager.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);

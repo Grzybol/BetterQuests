@@ -33,9 +33,11 @@ public class CommandManager implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "CommandManager.onCommand called, sender: " + sender + ", args: " + String.join(", ", args));
+        betterQuests.sendLogToElasticsearch("CommandManager.onCommand called, sender: " + sender + ", args: " + String.join(", ", args), "DEBUG");
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("betterquests.reload")) {
                 sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
+                betterQuests.sendLogToElasticsearch("Help command failed due to lack of permissions, sender: " + sender, "ERROR");
                 return true;
             }
             configManager.ReloadConfig();
@@ -49,11 +51,13 @@ public class CommandManager implements CommandExecutor {
         else if (args.length == 1 && args[0].equalsIgnoreCase("help")){
             if (!sender.hasPermission("betterquests.help")) {
                 sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
+                betterQuests.sendLogToElasticsearch("Help command failed due to lack of permissions, sender: " + sender, "ERROR");
                 return true;
             }
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+" /bq npcspawn <name>");
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+" /bq delete <name>");
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+" /bq reload");
+            betterQuests.sendLogToElasticsearch("Help displayed for sender: " + sender, "INFO");
         }
         else if (args.length == 2 && args[0].equalsIgnoreCase("npcspawn")) {
             if (!(sender instanceof Player)) {
@@ -80,13 +84,14 @@ public class CommandManager implements CommandExecutor {
             villager.setAI(true);
             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
             villager.setCollidable(false);
-            //villager.
+            villager.isInvisible();
 
             // Dodanie niestandardowego tagu do PDC
             PersistentDataContainer pdc = villager.getPersistentDataContainer();
             pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterQuestsNPC");
             fileManager.saveVillagerInfoToFile(villager.getUniqueId().toString(),args[1]);
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests] "+ChatColor.AQUA+ " Villager NPC spawned!");
+            betterQuests.sendLogToElasticsearch("NPC spawned successfully, player: " + player.getName() + ", NPC details: " + villager.toString(), "INFO");
             return true;
         }else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
             if (!(sender instanceof Player)) {
