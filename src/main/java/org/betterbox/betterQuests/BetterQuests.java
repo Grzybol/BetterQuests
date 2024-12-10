@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -99,11 +100,13 @@ public final class BetterQuests extends JavaPlugin {
                             villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
                             villager.setCollidable(false);
                             villager.isInvisible();
+                            PersistentDataContainer pdc = villager.getPersistentDataContainer();
+                            pdc.set(getVillagerKey(), PersistentDataType.STRING, "betterquests");
                         }
                     }
                 }
             }
-        }, 60L);//
+        }, 100L);//
 
         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "All NPCs have been initialized with restricted properties.");
 

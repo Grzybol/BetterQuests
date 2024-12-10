@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class EventManager implements Listener {
     private final BetterQuests betterQuests;
@@ -37,6 +38,7 @@ public class EventManager implements Listener {
         this.betterQuests = betterQuests;
         this.configManager =configManager;
     }
+    /*
     @EventHandler
     public void onVillagerSpawn(CreatureSpawnEvent event) {
         if (event.getEntity() instanceof Villager) {
@@ -53,13 +55,15 @@ public class EventManager implements Listener {
             }
         }
     }
+
+     */
     @EventHandler
     public void onVillagerDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Villager) {
             Villager villager = (Villager) event.getEntity();
             PersistentDataContainer pdc = villager.getPersistentDataContainer();
             String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
-            if (tag != null && tag.equals("betterQuestsNPC")) {
+            if (tag != null && tag.equals("betterquests")) {
                 event.setCancelled(true);
             }
         }
@@ -67,15 +71,17 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        String transactionID = UUID.randomUUID().toString();
         if (event.getRightClicked() instanceof Villager) {
             Villager villager = (Villager) event.getRightClicked();
+            //pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity called with parameters: "+event);
             // Sprawdzenie, czy Villager ma odpowiednią nazwę, np. "Quest Villager"
             if (villager.getCustomName() != null ) {
                 PersistentDataContainer pdc = villager.getPersistentDataContainer();
                 String tag = pdc.get(betterQuests.getVillagerKey(), PersistentDataType.STRING);
                 pluginLogger.log(PluginLogger.LogLevel.DEBUG, "EventManager.onPlayerInteractEntity villager tags: "+tag);
                 betterQuests.sendLogToElasticsearch("EventManager.onPlayerInteractEntity villager tags: "+tag, "DEBUG");
-                if (tag != null && tag.equals("betterQuestsNPC")) {
+                if (tag != null && tag.equals("betterquests")) {
                     if(event.getPlayer().isSneaking() && event.getPlayer().isOp()){
                         villager.remove();
                     }
