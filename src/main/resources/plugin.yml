@@ -2,9 +2,9 @@ name: BetterQuests
 version: ${project.version}
 main: org.betterbox.betterQuests.BetterQuests
 api-version: '1.18'
-load: STARTUP
+load: POSTWORLD
 authors: [ Grzybol ]
-depend: [PlaceholderAPI]
+depend: [PlaceholderAPI,ElasticBuffer]
 commands:
   bq:
     description: Base command for BetterQuests
