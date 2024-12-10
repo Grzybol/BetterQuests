@@ -88,7 +88,7 @@ public class CommandManager implements CommandExecutor {
 
             // Dodanie niestandardowego tagu do PDC
             PersistentDataContainer pdc = villager.getPersistentDataContainer();
-            pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterQuestsNPC");
+            pdc.set(betterQuests.getVillagerKey(), PersistentDataType.STRING, "betterquests");
             fileManager.saveVillagerInfoToFile(villager.getUniqueId().toString(),args[1]);
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests] "+ChatColor.AQUA+ " Villager NPC spawned!");
             betterQuests.sendLogToElasticsearch("NPC spawned successfully, player: " + player.getName() + ", NPC details: " + villager.toString(), "INFO");

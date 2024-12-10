@@ -1,5 +1,7 @@
 package org.betterbox.betterQuests;
 
+import org.betterbox.elasticBuffer.ElasticBuffer;
+import org.betterbox.elasticBuffer.ElasticBufferAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -12,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -20,10 +23,8 @@ import java.nio.charset.StandardCharsets;
 
 import java.io.File;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 public final class BetterQuests extends JavaPlugin {
@@ -75,71 +76,58 @@ public final class BetterQuests extends JavaPlugin {
         }
         configureAllVillagers();
         logger.info("[BetterQuest] Running");
-        kibanaTest();
+        loadElasticBuffer();
         sendLogToElasticsearch("Plugin started", "INFO");
-        NamespacedKey key = new NamespacedKey(this, "betterQuestsNPC");
+        NamespacedKey key = new NamespacedKey(this, "custom_villager");
 
-        // Przeszukiwanie wszystkich światów w poszukiwaniu NPC
-        for (World world : Bukkit.getWorlds()) {
-            for (Entity entity : world.getEntitiesByClass(Villager.class)) {
-                Villager villager = (Villager) entity;
-                if (villager.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
-                    // Ustaw ponownie właściwości NPC
-                    villager.setInvulnerable(true);
-                    villager.setCollidable(false);
-                    villager.setAI(false); // Ustaw zgodnie z preferencjami
-                    villager.setInvisible(true); // Ustaw zgodnie z preferencjami
-
-                    // Opcjonalnie: Ustaw prędkość ruchu
-                    AttributeInstance attribute = villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-                    if (attribute != null) {
-                        attribute.setBaseValue(0);
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            String transactionID = UUID.randomUUID().toString();
+            pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Setting up all villagers",transactionID);
+            for (World world : Bukkit.getWorlds()) {
+                pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Processing villagers in world: " + world.getName(),transactionID);
+                for (Entity entity : world.getEntities()) {
+                    if (entity instanceof Villager) {
+                        Villager villager = (Villager) entity;
+                        pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Processing villager: " + entity.getUniqueId()+", persistentDataContainer: "+ Arrays.toString(entity.getPersistentDataContainer().getKeys().toArray())+", hasBetterQuests: "+villager.getPersistentDataContainer().has(key, PersistentDataType.STRING),transactionID);
+                        if (villager.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
+                            pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Setting up villager: " + villager.getUniqueId(),transactionID);
+                            AttributeInstance attribute = villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+                            if (attribute != null) {
+                                attribute.setBaseValue(0);
+                            }
+                            villager.setAI(true);
+                            villager.setInvulnerable(true); // Uczyń wieśniaka nieśmiertelnym
+                            villager.setCollidable(false);
+                            villager.isInvisible();
+                        }
                     }
-
-                    // Upewnij się, że nazwa jest widoczna
-                    villager.setCustomNameVisible(true);
                 }
             }
-        }
+        }, 60L);//
 
         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "All NPCs have been initialized with restricted properties.");
 
 
 
     }
-    private static final Logger logger = LogManager.getLogger(BetterQuests.class);
-
-    public void kibanaTest() {
-        // Logowanie lokalne, informacja o rozpoczęciu wysyłania logów
-        pluginLogger.log(PluginLogger.LogLevel.INFO, "Rozpoczęcie wysyłania logów do Kibany");
-
-        try {
-            logger.trace("To jest TRACE log");
-            pluginLogger.log(PluginLogger.LogLevel.INFO, "Wysłano TRACE log do Kibany");
-
-            logger.debug("To jest DEBUG log");
-            pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Wysłano DEBUG log do Kibany");
-
-            logger.info("To jest INFO log");
-            pluginLogger.log(PluginLogger.LogLevel.INFO, "Wysłano INFO log do Kibany");
-
-            logger.warn("To jest WARN log");
-            pluginLogger.log(PluginLogger.LogLevel.WARNING, "Wysłano WARN log do Kibany");
-
-            logger.error("To jest ERROR log");
-            pluginLogger.log(PluginLogger.LogLevel.ERROR, "Wysłano ERROR log do Kibany");
-
-            logger.fatal("To jest FATAL log");
-            pluginLogger.log(PluginLogger.LogLevel.ERROR, "Wysłano FATAL log do Kibany");
-
-        } catch (Exception e) {
-            // Logowanie lokalne w przypadku błędu
-            pluginLogger.log(PluginLogger.LogLevel.ERROR, "Błąd podczas wysyłania logów do Kibany: " + e.getMessage());
+    private void loadElasticBuffer(){
+        try{
+            PluginManager pm = Bukkit.getPluginManager();
+            try {
+                // Opóźnienie o 5 sekund, aby dać ElasticBuffer czas na pełną inicjalizację
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                pluginLogger.log(PluginLogger.LogLevel.WARNING, "[BetterElo] Initialization delay interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt(); // Przywrócenie statusu przerwania wątku
+            }
+            ElasticBuffer elasticBuffer = (ElasticBuffer) pm.getPlugin("ElasticBuffer");
+            pluginLogger.isElasticBufferEnabled=true;
+            pluginLogger.api= new ElasticBufferAPI(elasticBuffer);
+        }catch (Exception e){
+            pluginLogger.log(PluginLogger.LogLevel.ERROR, "ElasticBufferAPI instance found via ServicesManager, exception: "+e.getMessage());
         }
-
-        // Logowanie lokalne, informacja o zakończeniu wysyłania logów
-        pluginLogger.log(PluginLogger.LogLevel.INFO, "Zakończono wysyłanie logów do Kibany");
     }
+    private static final Logger logger = LogManager.getLogger(BetterQuests.class);
 
     public void configureAllVillagers() {
         pluginLogger.log(PluginLogger.LogLevel.DEBUG, "Configuring all villagers");
