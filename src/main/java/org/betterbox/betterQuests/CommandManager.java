@@ -42,6 +42,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             configManager.ReloadConfig();
+            lang.loadLangFile();
             betterQuests.configureAllVillagers();
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.AQUA + " Configuration reloaded!");
             return true;
