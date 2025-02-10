@@ -40,6 +40,7 @@ public final class BetterQuests extends JavaPlugin {
     public ItemStack rewardItem;
     private NamespacedKey villagerKey;
     private Placeholders placeholdersManager;
+    private Lang lang;
 
     @Override
     public void onEnable() {
@@ -58,17 +59,18 @@ public final class BetterQuests extends JavaPlugin {
         Set<PluginLogger.LogLevel> defaultLogLevels = EnumSet.of(PluginLogger.LogLevel.INFO, PluginLogger.LogLevel.WARNING, PluginLogger.LogLevel.ERROR);
         pluginLogger = new PluginLogger(folderPath, defaultLogLevels,this);
         folderPath =getDataFolder().getAbsolutePath();
+        lang = new Lang(this, pluginLogger);
         configManager = new ConfigManager(this, pluginLogger, folderPath,this);
         fileManager = new FileManager(getDataFolder().getAbsolutePath(),this,this,pluginLogger);
-        getCommand("bq").setExecutor(new CommandManager(this,this,fileManager,pluginLogger,configManager));
-        eventManager = new EventManager(pluginLogger,this, configManager);
+        getCommand("bq").setExecutor(new CommandManager(this,this,fileManager,pluginLogger,configManager,lang));
+        eventManager = new EventManager(pluginLogger,this, configManager,lang);
         getServer().getPluginManager().registerEvents(eventManager, this);
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Starting startGeneratorsScheduler and loadGenerators()");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Generators loaded, starting schedulers");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Schedulers started");
         pluginLogger.log(PluginLogger.LogLevel.INFO, "Plugin enabled");
         // Inicjalizacja Placeholders
-        placeholdersManager = new Placeholders(this,configManager);
+        placeholdersManager = new Placeholders(this,configManager,lang);
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             boolean success = placeholdersManager.register();
             pluginLogger.log(PluginLogger.LogLevel.DEBUG, "BetterQuests: Placeholders zostały zarejestrowane w PlaceholderAPI. success="+success);

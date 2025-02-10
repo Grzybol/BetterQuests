@@ -6,10 +6,12 @@ import org.bukkit.entity.Player;
 public class Placeholders extends PlaceholderExpansion {
     private final BetterQuests plugin;
     private final ConfigManager configManager;
+    private final Lang lang;
 
-    public Placeholders(BetterQuests plugin, ConfigManager configManager) {
+    public Placeholders(BetterQuests plugin, ConfigManager configManager, Lang lang) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.lang = lang;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class Placeholders extends PlaceholderExpansion {
     }
     public String formatTime(long milliseconds) {
         if (milliseconds < 0) {
-            return "Time is up!";
+            return lang.timeIsUp;
         }
 
         long totalSeconds = milliseconds / 1000;
@@ -50,16 +52,16 @@ public class Placeholders extends PlaceholderExpansion {
         StringBuilder timeString = new StringBuilder();
 
         if (days > 0) {
-            timeString.append(days).append(" ").append("days").append(" | ");
+            timeString.append(days).append(" ").append(lang.dayString).append(" | ");
         }
         if (hours > 0) {
-            timeString.append(hours).append(" ").append("hours").append(" | ");
+            timeString.append(hours).append(" ").append(lang.hourString).append(" | ");
         }
         if (minutes > 0) {
-            timeString.append(minutes).append(" ").append("minutes").append(" | ");
+            timeString.append(minutes).append(" ").append(lang.minuteString).append(" | ");
         }
         if (seconds > 0 || timeString.length() == 0) {
-            timeString.append(seconds).append(" ").append("seconds");
+            timeString.append(seconds).append(" ").append(lang.secondsString);
         }
 
         return timeString.toString().trim();
@@ -81,7 +83,7 @@ public class Placeholders extends PlaceholderExpansion {
                 if (plugin.rewardItem != null) {
                     return PlainTextComponentSerializer.plainText().serialize(plugin.rewardItem.getItemMeta().displayName())+" x"+plugin.rewardItem.getAmount();
                 } else {
-                    return "No reward set";
+                    return lang.noRewardset;
                 }
         }
         return null; // Zwróć null, jeśli placeholder nie jest obsługiwany

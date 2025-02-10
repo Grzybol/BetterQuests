@@ -32,11 +32,13 @@ public class EventManager implements Listener {
     private final BetterQuests betterQuests;
     private final PluginLogger pluginLogger;
     private final ConfigManager configManager;
+    private final Lang lang;
 
-    public EventManager(PluginLogger pluginLogger, BetterQuests betterQuests, ConfigManager configManager) {
+    public EventManager(PluginLogger pluginLogger, BetterQuests betterQuests, ConfigManager configManager, Lang lang) {
         this.pluginLogger = pluginLogger;
         this.betterQuests = betterQuests;
         this.configManager =configManager;
+        this.lang = lang;
     }
     /*
     @EventHandler
@@ -116,14 +118,14 @@ public class EventManager implements Listener {
         Duration fadeOut = Duration.ofMillis(300); // czas znikania
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Component TitleComponent;
-        TitleComponent = Component.text(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Not enough items! Required items:");
+        TitleComponent = Component.text(ChatColor.DARK_RED + "" + ChatColor.BOLD + lang.notEnoughItemsRequiredItems);
         // Inicjalizacja StringBuilder
 
         Component SubtitleComponent = Component.text(ChatColor.GOLD +configManager.getActiveRequiredItemStacksString());
         // Notify the killer
         Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
         player.showTitle(killerTitle);
-        player.sendMessage(ChatColor.DARK_RED+ ""+ChatColor.BOLD + "Not enough items! Required items: "+configManager.getActiveRequiredItemStacksString());
+        player.sendMessage(ChatColor.DARK_RED+ ""+ChatColor.BOLD + lang.notEnoughItemsRequiredItems+configManager.getActiveRequiredItemStacksString());
     }
 
     private void showRewardItems(Player player) {
@@ -142,8 +144,8 @@ public class EventManager implements Listener {
             name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName())+" x"+item.getAmount();
         }
 
-        TitleComponent = Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + "Reward: "+name);
-        Component SubtitleComponent = Component.text(ChatColor.GOLD +"Removed: "+configManager.getActiveRequiredItemStacksString());
+        TitleComponent = Component.text(ChatColor.GREEN + "" + ChatColor.BOLD +lang.rewardString+name);
+        Component SubtitleComponent = Component.text(ChatColor.GOLD +lang.rewardString+configManager.getActiveRequiredItemStacksString());
         // Notify the killer
         Title killerTitle = Title.title(TitleComponent,SubtitleComponent,times);
         player.showTitle(killerTitle);
@@ -176,26 +178,8 @@ public class EventManager implements Listener {
         return true;
     }
 
-    private void openNPCDialog(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, "BetterQuests");
 
-        ItemStack accept = new ItemStack(Material.GREEN_WOOL, 1);
-        ItemMeta acceptMeta = accept.getItemMeta();
-        acceptMeta.setDisplayName(ChatColor.GREEN + "A");
-        accept.setItemMeta(acceptMeta);
-
-        ItemStack decline = new ItemStack(Material.RED_WOOL, 1);
-        ItemMeta declineMeta = decline.getItemMeta();
-        declineMeta.setDisplayName(ChatColor.RED + "Odrzuć");
-        decline.setItemMeta(declineMeta);
-
-        inv.setItem(11, accept);
-        inv.setItem(15, decline);
-
-        player.openInventory(inv);
-        player.sendMessage(ChatColor.GOLD + "NPC mówi: " + ChatColor.WHITE + "Czy chcesz zaakceptować ten quest? Jest to bardzo ważna misja!");
-    }
-
+    /*
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getView().getTitle().equals("BetterQuests")) {
@@ -214,5 +198,7 @@ public class EventManager implements Listener {
             }
         }
     }
+
+     */
 
 }
