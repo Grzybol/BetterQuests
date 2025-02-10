@@ -23,9 +23,11 @@ public class CommandManager implements CommandExecutor {
     private final FileManager fileManager;
     private final ConfigManager configManager;
     private PluginLogger pluginLogger;
-    public CommandManager(JavaPlugin plugin, BetterQuests betterQuests, FileManager fileManager, PluginLogger pluginLogger,ConfigManager configManager){
+    private final Lang lang;
+    public CommandManager(JavaPlugin plugin, BetterQuests betterQuests, FileManager fileManager, PluginLogger pluginLogger,ConfigManager configManager, Lang lang) {
         this.configManager=configManager;
         this.plugin = plugin;
+        this.lang = lang;
         this.pluginLogger = pluginLogger;
         this.betterQuests = betterQuests;
         this.fileManager = fileManager;
@@ -36,8 +38,7 @@ public class CommandManager implements CommandExecutor {
         betterQuests.sendLogToElasticsearch("CommandManager.onCommand called, sender: " + sender + ", args: " + String.join(", ", args), "DEBUG");
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("betterquests.reload")) {
-                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
-                betterQuests.sendLogToElasticsearch("Help command failed due to lack of permissions, sender: " + sender, "ERROR");
+                noPermission(sender, args[0]);
                 return true;
             }
             configManager.ReloadConfig();
@@ -50,8 +51,7 @@ public class CommandManager implements CommandExecutor {
         }
         else if (args.length == 1 && args[0].equalsIgnoreCase("help")){
             if (!sender.hasPermission("betterquests.help")) {
-                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
-                betterQuests.sendLogToElasticsearch("Help command failed due to lack of permissions, sender: " + sender, "ERROR");
+                noPermission(sender, args[0]);
                 return true;
             }
             sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.GREEN+" /bq npcspawn <name>");
@@ -65,7 +65,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             if (!sender.hasPermission("betterquests.npcspawn")) {
-                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
+                noPermission(sender, args[0]);
                 return true;
             }
 
@@ -99,7 +99,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             if (!sender.hasPermission("betterquests.npcdelete")) {
-                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + "You don't have permission to do that!");
+                noPermission(sender, args[0]);
                 return true;
             }
 
@@ -129,7 +129,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             if (!sender.hasPermission("betterquests.saveitem")) {
-                sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"[BetterQuests]"+ChatColor.DARK_RED + " You don't have permission to do that!");
+                noPermission(sender, args[0]);
                 return true;
             }
             Player player = (Player) sender;
@@ -139,5 +139,10 @@ public class CommandManager implements CommandExecutor {
             return true;
         }
         return false;
+    }
+    private void noPermission(CommandSender sender,String command) {
+        //betterQuests.sendLogToElasticsearch("Help command failed due to lack of permissions, sender: " + sender, "ERROR");
+        pluginLogger.log(PluginLogger.LogLevel.ERROR, "Help command failed due to lack of permissions, sender: " + sender+", command: "+command);
+        sender.sendMessage(ChatColor.RED + lang.noPermission);
     }
 }

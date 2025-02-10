@@ -6,7 +6,7 @@
 
     <groupId>org.betterbox</groupId>
     <artifactId>BetterQuests</artifactId>
-    <version>1.1.39-SNAPSHOT</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BetterQuests</name>
